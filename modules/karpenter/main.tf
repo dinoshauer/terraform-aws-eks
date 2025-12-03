@@ -68,6 +68,10 @@ resource "aws_iam_role" "controller" {
   force_detach_policies = true
 
   tags = merge(var.tags, var.iam_role_tags)
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy" "controller" {
@@ -77,6 +81,10 @@ resource "aws_iam_role_policy" "controller" {
   name_prefix = var.iam_policy_use_name_prefix ? "${var.iam_policy_name}-" : null
   role        = aws_iam_role.controller[0].name
   policy      = data.aws_iam_policy_document.controller[0].json
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_policy" "controller" {
@@ -89,6 +97,10 @@ resource "aws_iam_policy" "controller" {
   policy      = data.aws_iam_policy_document.controller[0].json
 
   tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "controller" {
@@ -120,6 +132,10 @@ resource "aws_eks_pod_identity_association" "karpenter" {
   role_arn        = aws_iam_role.controller[0].arn
 
   tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 ################################################################################
@@ -349,6 +365,10 @@ resource "aws_iam_role" "node" {
   force_detach_policies = true
 
   tags = merge(var.tags, var.node_iam_role_tags)
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Policies attached ref https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group
@@ -364,6 +384,10 @@ resource "aws_iam_role_policy_attachment" "node" {
 
   policy_arn = each.value
   role       = aws_iam_role.node[0].name
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "node_additional" {
